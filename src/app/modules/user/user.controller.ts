@@ -1,35 +1,21 @@
 import { Request, Response } from "express";
 import { userService } from "./user.service";
-import { userValidationSchema } from "./user.validation";
-import { ZodError } from "zod";
+import { CatchAsyncError } from "../../utils/CatchAsyncError";
 
-const createUser = async (req: Request, res: Response) => {
-  try {
-    const user = req.body;
+const createUser = CatchAsyncError(async (req: Request, res: Response) => {
+  const user = req.body;
 
-    //using validation with zod
-    const zodParseUser = userValidationSchema.parse(user);
+  const result = await userService.creteUserService(user);
 
-    const result = await userService.creteUserService(zodParseUser);
+  //remove password from result
+  const changeResult = { ...result.toObject(), password: undefined };
 
-    //remove password from result
-    const changeResult = { ...result.toObject(), password: undefined };
-
-    res.status(201).json({
-      success: true,
-      message: "User created successfully!",
-      data: changeResult,
-    });
-  } catch (error: unknown) {
-    if (error instanceof ZodError) {
-      res.status(400).json({
-        success: false,
-        message: "Please give valid data!",
-        error: error?.issues,
-      });
-    }
-  }
-};
+  res.status(201).json({
+    success: true,
+    message: "User created successfully!",
+    data: changeResult,
+  });
+});
 
 const getSingleUser = async (req: Request, res: Response) => {
   try {

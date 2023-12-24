@@ -1,9 +1,15 @@
 import express from "express";
 import { userControllers } from "./user.controller";
+import validateRequest from "../../middleware/validateRequest";
+import { userValidationSchema } from "./user.validation";
 
 const route = express.Router();
 
-route.post("/users", userControllers.createUser);
+route.post(
+  "/users",
+  validateRequest(userValidationSchema),
+  userControllers.createUser
+);
 
 route.get("/users/:userId", userControllers.getSingleUser);
 

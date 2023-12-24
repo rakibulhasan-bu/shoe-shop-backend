@@ -1,6 +1,8 @@
 import express, { Application, Request, Response } from "express";
 import cors from "cors";
 import { userRoute } from "./modules/user/user.route";
+import notFoundRoute from "./middleware/notFoundRoute";
+import globalErrorHandler from "./middleware/globalErrorHandler";
 const app: Application = express();
 
 //using parser
@@ -11,19 +13,13 @@ app.use(cors());
 app.use("/api", userRoute);
 
 app.get("/", (_req: Request, res: Response) => {
-  res.send(`User CRUD server is working perfectly`);
+  res.send(`Shoe shop server is working perfectly`);
 });
 
 // unknown route handling
-app.all("*", (req, res) => {
-  res.status(400).json({
-    success: false,
-    message: `Route ${req.originalUrl} cannot found`,
-    error: {
-      code: 404,
-      description: "Please provide an valid Route",
-    },
-  });
-});
+app.all("*", notFoundRoute);
+
+//global error handling
+app.use(globalErrorHandler);
 
 export default app;
